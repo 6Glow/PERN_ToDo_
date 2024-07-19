@@ -1,10 +1,22 @@
 import React, { Fragment, useEffect, useState } from "react";
 
 
-
 const ListTodos = () => {
   const [todos, setTodos] = useState([]);
 
+  //delete todo function
+
+  const deleteTodo = async id => {
+    try {
+      const deleteTodo = await fetch(`http://localhost:5000/todos/${id}`, {
+        method: "DELETE"
+      });
+
+      setTodos(todos.filter(todo => todo.todo_id !== id));
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
 
   const getTodos = async () => {
     try {
@@ -42,7 +54,11 @@ const ListTodos = () => {
                 Edit
               </td>
               <td>
-                Delete
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteTodo(todo.todo_id)}>
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
