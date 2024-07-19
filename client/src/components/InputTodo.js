@@ -2,9 +2,15 @@ import React, { Fragment, useState } from "react";
 
 const InputTodo = () => {
   const [description, setDescription] = useState("");
+  const [error, setError] = useState(null);
 
   const onSubmitForm = async e => {
     e.preventDefault();
+    if (!description.trim()) {
+      setError("Description cannot be empty");
+      return;
+    }
+
     try {
       const body = { description };
       const response = await fetch("http://localhost:5000/todos", {
@@ -13,9 +19,16 @@ const InputTodo = () => {
         body: JSON.stringify(body)
       });
 
-      window.location = "/";
+      if (response.ok) {
+        setDescription("");
+        setError(null);
+        window.location = "/";
+      } else {
+        throw new Error("Failed to add todo");
+      }
     } catch (err) {
       console.error(err.message);
+      setError("Failed to add todo");
     }
   };
 
@@ -27,10 +40,15 @@ const InputTodo = () => {
           type="text"
           className="form-control"
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={e => {
+            setDescription(e.target.value);
+            setError(null);
+          }}
+          placeholder="Enter your todo"
         />
         <button className="btn btn-success">Add</button>
       </form>
+      {error && <p className="text-danger mt-2">{error}</p>}
     </Fragment>
   );
 };
